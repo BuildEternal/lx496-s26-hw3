@@ -60,8 +60,8 @@ The point values for each problem are given below.
 | 2a: Freeze Non-Bias Weights         | Code             | 2      |
 | 2b: Set Up Trainer and Tester       | Code             | 4      |
 | 2c: Set Up Hyperparameter Tuning    | Code             | 4      |
-| 3a: Train Models                    | Code and Written | 2      |
-| 3b: Test Models and Report Results  | Code and Written | 2      |
+| 3b: Train Models                    | Code and Written | 2      |
+| 3c: Test Models and Report Results  | Code and Written | 2      |
 | **Total**                           |                  | **20** |
 
 ### Rubric for Code Problems
