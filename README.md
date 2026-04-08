@@ -1,6 +1,6 @@
 # HW 3: Efficient Fine-Tuning with BitFit?
 
-**Due: April 20, 9:30 AM**
+**Due: April 21, 9:30 AM**
 
 For this assignment, please complete the _problem set_ found in `hw3-pset.ipynb`. The problem set includes coding
 problems as well as written problems.
@@ -99,7 +99,7 @@ Partial credit may be awarded at the graders' discretion.
 
 ## Late Submissions and Resubmissions
 
-Grading will commence on April 27, 2026, and solutions will be released on that day. Therefore, no late submissions will
-be accepted after 9:30 AM on April 27. You may resubmit your solutions as many times as you like; only the final
-submission will be graded. If the final submission occurs after the deadline on April 20, then your submission will be
+Grading will commence on April 28, 2026, and solutions will be released on that day. Therefore, no late submissions will
+be accepted after 9:30 AM on April 28. You may resubmit your solutions as many times as you like; only the final
+submission will be graded. If the final submission occurs after the deadline on April 21, then your submission will be
 considered late even if you have previously submitted your solution before the deadline.
