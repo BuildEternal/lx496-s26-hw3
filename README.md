@@ -65,6 +65,8 @@ The point values for each problem are given below.
 | 2c: Set Up Hyperparameter Tuning    | Code             | 4      |
 | 3b: Train Models                    | Code and Written | 2      |
 | 3c: Test Models and Report Results  | Code and Written | 2      |
+| 4a: Ask Your Friends for Help       | No Submission    | 1 EC   |
+| 4b: Help a Friend                   | No Submission    | 1 EC   |
 | **Total**                           |                  | **20** |
 
 ### Rubric for Code Problems
