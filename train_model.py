@@ -1,6 +1,7 @@
 """
 Code for Problem 1 of HW 2.
 """
+
 import pickle
 from typing import Any, Dict
 
@@ -8,12 +9,10 @@ import evaluate
 import numpy as np
 import optuna
 from datasets import Dataset, load_dataset
-from transformers import BertTokenizerFast, BertForSequenceClassification, \
-    Trainer, TrainingArguments, EvalPrediction
+from transformers import BertTokenizerFast, BertForSequenceClassification, Trainer, TrainingArguments, EvalPrediction
 
 
-def preprocess_dataset(dataset: Dataset, tokenizer: BertTokenizerFast) \
-        -> Dataset:
+def preprocess_dataset(dataset: Dataset, tokenizer: BertTokenizerFast) -> Dataset:
     """
     Problem 1d: Implement this function.
 
@@ -24,11 +23,10 @@ def preprocess_dataset(dataset: Dataset, tokenizer: BertTokenizerFast) \
     :param tokenizer: A tokenizer
     :return: The dataset, prepreprocessed using the tokenizer
     """
-    raise NotImplementedError("Problem 1d has not been completed yet!")
+    return dataset.map(lambda x: tokenizer(x["text"], padding=True, truncation=True, return_tensors="pt"), batched=True)
 
 
-def init_model(trial: Any, model_name: str, use_bitfit: bool = False) -> \
-        BertForSequenceClassification:
+def init_model(trial: Any, model_name: str, use_bitfit: bool = False) -> BertForSequenceClassification:
     """
     Problem 2a: Implement this function.
 
@@ -49,8 +47,7 @@ def init_model(trial: Any, model_name: str, use_bitfit: bool = False) -> \
     raise NotImplementedError("Problem 2a has not been completed yet!")
 
 
-def init_trainer(model_name: str, train_data: Dataset, val_data: Dataset,
-                 use_bitfit: bool = False) -> Trainer:
+def init_trainer(model_name: str, train_data: Dataset, val_data: Dataset, use_bitfit: bool = False) -> Trainer:
     """
     Prolem 2b: Implement this function.
 
@@ -87,7 +84,7 @@ if __name__ == "__main__":  # Use this script to train your model
 
     # Load IMDb dataset and create validation split
     imdb = load_dataset("imdb")
-    split = imdb["train"].train_test_split(.2, seed=3463)
+    split = imdb["train"].train_test_split(0.2, seed=3463)
     imdb["train"] = split["train"]
     imdb["val"] = split["test"]
     del imdb["unsupervised"]
@@ -100,8 +97,7 @@ if __name__ == "__main__":  # Use this script to train your model
     imdb["val"] = preprocess_dataset(imdb["val"], tokenizer)
 
     # Set up trainer
-    trainer = init_trainer(model_name, imdb["train"], imdb["val"],
-                           use_bitfit=True)
+    trainer = init_trainer(model_name, imdb["train"], imdb["val"], use_bitfit=True)
 
     # Train and save the best hyperparameters
     best = trainer.hyperparameter_search(**hyperparameter_search_settings())
