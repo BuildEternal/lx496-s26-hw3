@@ -10,11 +10,7 @@ import evaluate
 import numpy as np
 import optuna
 from datasets import Dataset, load_dataset
-from transformers import BertTokenizerFast, BertForSequenceClassification, Trainer, TrainingArguments, EvalPrediction
-
-
-def tokenize(batch):
-    return tokenizer(batch["text"], padding=True, truncation=True, return_tensors="pt")
+from transformers import BertTokenizerFast, BertForSequenceClassification, Trainer, TrainingArguments, EvalPrediction  # type: ignore
 
 
 def preprocess_dataset(dataset: Dataset, tokenizer: BertTokenizerFast) -> Dataset:
@@ -28,6 +24,10 @@ def preprocess_dataset(dataset: Dataset, tokenizer: BertTokenizerFast) -> Datase
     :param tokenizer: A tokenizer
     :return: The dataset, prepreprocessed using the tokenizer
     """
+
+    def tokenize(batch):
+        return tokenizer(batch["text"], padding=True, truncation=True, return_tensors="pt")
+
     return dataset.map(tokenize, batched=True, remove_columns=dataset.column_names)
 
 
@@ -57,12 +57,10 @@ def init_model(trial: Any, model_name: str, use_bitfit: bool = False) -> BertFor
     return model
 
 
-accuracy = evaluate.load("accuracy")
-
-def compute_metrics(eval_pred):
-    logits, labels = eval_pred
-    preds = np.argmax(logits, axis=-1)
-    return accuracy.compute(predictions=preds, references=labels) or {}
+def compute_metrics(p: EvalPrediction) -> dict[str, float]:
+    preds = np.argmax(p.predictions, axis=-1)
+    acc = (preds == p.label_ids).mean()
+    return {"accuracy": float(acc)}
 
 
 def init_trainer(model_name: str, train_data: Dataset, val_data: Dataset, use_bitfit: bool = False) -> Trainer:
@@ -105,6 +103,23 @@ def init_trainer(model_name: str, train_data: Dataset, val_data: Dataset, use_bi
     )
 
 
+"""
+### Problem 1c
+
+According to the GitHub README, hyperparameter tuning was done by choosing the best hyperparameters (between batch sizes
+of 8, 16, 32, 64, or 128, and learning rates of 3e-4, 1e-4, 5e-5, or 3e-5), and then training for 4 epochs.
+
+### Problem 2c
+
+Finally, to complete the experiment setup, you will implement hyperparameter tuning using the [Optuna](https://optuna.org/) framework. Optuna is integrated with 🤗 Transformers, and it can be invoked via the `Trainer.hyperparameter_search` method. Please implement the function `hyperparameter_search_settings` in `train_model.py` by returing the correct keyword arguments for `Trainer.hyperparameter_search`. (Observe that, at the end of `train_model.py`, these keyword arguments are passed to `Trainer.hyperparameter_search` via dictionary unpacking.)
+
+Your code should support the following requirements.
+- Your hyperparameter tuning configuration must match your answer for Problem 1c.
+- You must use Optuna for hyperparameter tuning.
+- You must indicate to Optuna that the hyperparameter search should maximize accuracy.
+"""
+
+
 def hyperparameter_search_settings() -> Dict[str, Any]:
     """
     Problem 2c: Implement this function.
@@ -115,7 +130,18 @@ def hyperparameter_search_settings() -> Dict[str, Any]:
 
     :return: Keyword arguments for Trainer.hyperparameter_search
     """
-    raise NotImplementedError("Problem 2c has not been completed yet!")
+    return {
+        "direction": "maximize",
+        "n_trials": 20,
+        "backend": "optuna",
+        "hp_space": lambda trial: {
+            "learning_rate": trial.suggest_categorical("learning_rate", [3e-4, 1e-4, 5e-5, 3e-5]),
+            "per_device_train_batch_size": trial.suggest_categorical(
+                "per_device_train_batch_size", [8, 16, 32, 64, 128]
+            ),
+        },
+        "compute_objective": lambda metrics: metrics["eval_accuracy"],
+    }
 
 
 if __name__ == "__main__":  # Use this script to train your model
