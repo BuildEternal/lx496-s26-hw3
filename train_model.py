@@ -12,6 +12,10 @@ from datasets import Dataset, load_dataset
 from transformers import BertTokenizerFast, BertForSequenceClassification, Trainer, TrainingArguments, EvalPrediction
 
 
+def tokenize(batch):
+    return tokenizer(batch["text"], padding=True, truncation=True, return_tensors="pt")
+
+
 def preprocess_dataset(dataset: Dataset, tokenizer: BertTokenizerFast) -> Dataset:
     """
     Problem 1d: Implement this function.
@@ -23,7 +27,7 @@ def preprocess_dataset(dataset: Dataset, tokenizer: BertTokenizerFast) -> Datase
     :param tokenizer: A tokenizer
     :return: The dataset, prepreprocessed using the tokenizer
     """
-    return dataset.map(lambda x: tokenizer(x["text"], padding=True, truncation=True, return_tensors="pt"), batched=True)
+    return dataset.map(tokenize, batched=True, remove_columns=dataset.column_names)
 
 
 def init_model(trial: Any, model_name: str, use_bitfit: bool = False) -> BertForSequenceClassification:
