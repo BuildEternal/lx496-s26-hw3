@@ -103,23 +103,6 @@ def init_trainer(model_name: str, train_data: Dataset, val_data: Dataset, use_bi
     )
 
 
-"""
-### Problem 1c
-
-According to the GitHub README, hyperparameter tuning was done by choosing the best hyperparameters (between batch sizes
-of 8, 16, 32, 64, or 128, and learning rates of 3e-4, 1e-4, 5e-5, or 3e-5), and then training for 4 epochs.
-
-### Problem 2c
-
-Finally, to complete the experiment setup, you will implement hyperparameter tuning using the [Optuna](https://optuna.org/) framework. Optuna is integrated with 🤗 Transformers, and it can be invoked via the `Trainer.hyperparameter_search` method. Please implement the function `hyperparameter_search_settings` in `train_model.py` by returing the correct keyword arguments for `Trainer.hyperparameter_search`. (Observe that, at the end of `train_model.py`, these keyword arguments are passed to `Trainer.hyperparameter_search` via dictionary unpacking.)
-
-Your code should support the following requirements.
-- Your hyperparameter tuning configuration must match your answer for Problem 1c.
-- You must use Optuna for hyperparameter tuning.
-- You must indicate to Optuna that the hyperparameter search should maximize accuracy.
-"""
-
-
 def hyperparameter_search_settings() -> Dict[str, Any]:
     """
     Problem 2c: Implement this function.
