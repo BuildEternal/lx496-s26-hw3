@@ -1,12 +1,12 @@
 """
 Code for Problem 1 of HW 2.
 """
+
 import pickle
 
 import evaluate
 from datasets import load_dataset
-from transformers import BertTokenizerFast, BertForSequenceClassification, \
-    Trainer, TrainingArguments
+from transformers import BertTokenizerFast, BertForSequenceClassification, Trainer, TrainingArguments # type: ignore
 
 from train_model import compute_metrics, preprocess_dataset
 
@@ -53,6 +53,6 @@ if __name__ == "__main__":  # Use this script to test your model
     tester = init_tester("path_to_your_best_model")
 
     # Test
-    results = tester.predict(imdb["test"]) # type: ignore
+    results = tester.predict(imdb["test"])  # type: ignore
     with open("test_results.p", "wb") as f:
         pickle.dump(results, f)
