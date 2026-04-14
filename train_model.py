@@ -48,7 +48,12 @@ def init_model(trial: Any, model_name: str, use_bitfit: bool = False) -> BertFor
         than bias terms
     :return: A newly initialized pre-trained Transformer classifier
     """
-    raise NotImplementedError("Problem 2a has not been completed yet!")
+    model = BertForSequenceClassification.from_pretrained(model_name)
+    if use_bitfit:
+        for name, param in model.named_parameters():
+            if "bias" not in name:
+                param.requires_grad = False
+    return model
 
 
 def init_trainer(model_name: str, train_data: Dataset, val_data: Dataset, use_bitfit: bool = False) -> Trainer:
