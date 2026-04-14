@@ -2,6 +2,7 @@
 Code for Problem 1 of HW 2.
 """
 
+from functools import partial
 import pickle
 from typing import Any, Dict
 
@@ -51,9 +52,17 @@ def init_model(trial: Any, model_name: str, use_bitfit: bool = False) -> BertFor
     model = BertForSequenceClassification.from_pretrained(model_name)
     if use_bitfit:
         for name, param in model.named_parameters():
-            if "bias" not in name:
+            if not name.endswith(".bias"):
                 param.requires_grad = False
     return model
+
+
+accuracy = evaluate.load("accuracy")
+
+def compute_metrics(eval_pred):
+    logits, labels = eval_pred
+    preds = np.argmax(logits, axis=-1)
+    return accuracy.compute(predictions=preds, references=labels) or {}
 
 
 def init_trainer(model_name: str, train_data: Dataset, val_data: Dataset, use_bitfit: bool = False) -> Trainer:
@@ -72,7 +81,28 @@ def init_trainer(model_name: str, train_data: Dataset, val_data: Dataset, use_bi
         than bias terms
     :return: A Trainer used for training
     """
-    raise NotImplementedError("Problem 2b has not been completed yet!")
+    training_args = TrainingArguments(
+        output_dir="./checkpoints",
+        num_train_epochs=4,
+        per_device_train_batch_size=2,
+        gradient_accumulation_steps=8,
+        gradient_checkpointing=True,
+        bf16=True,
+        learning_rate=2e-5,
+        logging_steps=10,
+        eval_strategy="epoch",
+        save_strategy="epoch",
+        load_best_model_at_end=True,
+        metric_for_best_model="accuracy",
+        greater_is_better=True,
+    )
+    return Trainer(
+        model_init=partial(init_model, model_name=model_name, use_bitfit=use_bitfit),
+        args=training_args,
+        train_dataset=train_data,
+        eval_dataset=val_data,
+        compute_metrics=compute_metrics,
+    )
 
 
 def hyperparameter_search_settings() -> Dict[str, Any]:

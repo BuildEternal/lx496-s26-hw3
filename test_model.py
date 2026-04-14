@@ -8,7 +8,7 @@ from datasets import load_dataset
 from transformers import BertTokenizerFast, BertForSequenceClassification, \
     Trainer, TrainingArguments
 
-from train_model import preprocess_dataset
+from train_model import compute_metrics, preprocess_dataset
 
 
 def init_tester(directory: str) -> Trainer:
@@ -23,7 +23,18 @@ def init_tester(directory: str) -> Trainer:
         saved
     :return: A Trainer used for testing
     """
-    raise NotImplementedError("Problem 2b has not been completed yet!")
+    model = BertForSequenceClassification.from_pretrained(directory)
+
+    args = TrainingArguments(
+        output_dir="./checkpoints",
+        per_device_eval_batch_size=8,
+    )
+
+    return Trainer(
+        model=model,
+        args=args,
+        compute_metrics=compute_metrics,
+    )
 
 
 if __name__ == "__main__":  # Use this script to test your model
@@ -42,6 +53,6 @@ if __name__ == "__main__":  # Use this script to test your model
     tester = init_tester("path_to_your_best_model")
 
     # Test
-    results = tester.predict(imdb["test"])
+    results = tester.predict(imdb["test"]) # type: ignore
     with open("test_results.p", "wb") as f:
         pickle.dump(results, f)
