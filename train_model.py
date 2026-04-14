@@ -26,7 +26,7 @@ def preprocess_dataset(dataset: Dataset, tokenizer: BertTokenizerFast) -> Datase
     """
 
     def tokenize(batch):
-        return tokenizer(batch["text"], padding=True, truncation=True, return_tensors="pt")
+        return tokenizer(batch["text"], padding=True, truncation=True, return_tensors="np")
 
     return dataset.map(tokenize, batched=True, remove_columns=dataset.column_names)
 
