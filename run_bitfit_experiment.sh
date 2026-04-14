@@ -21,5 +21,5 @@
 module load miniconda
 module load academic-ml/spring-2026
 conda activate spring-2026-pyt
-cd /projectnb/lx496sh/students/your_bu_id  # Modify this with your information
+cd /projectnb/lx496sh/students/U84542386  # Modify this with your information
 python train_model.py
