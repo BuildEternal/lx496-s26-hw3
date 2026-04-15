@@ -13,3 +13,10 @@ tokens, since there is a $1$ whereever a word token is present and $0$ whenever 
 
 According to the GitHub README, hyperparameter tuning was done by choosing the best hyperparameters (between batch sizes
 of 8, 16, 32, 64, or 128, and learning rates of 3e-4, 1e-4, 5e-5, or 3e-5), and then training for 4 epochs.
+
+### Problem 3b
+
+|                | Validation Accuracy | Learning Rate | Batch Size |
+|----------------|---------------------|---------------|------------|
+| Without BitFit |              0.8854 |        0.0003 |          8 |
+| With BitFit    |              0.6284 |         5e-05 |         64 |
