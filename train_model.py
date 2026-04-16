@@ -28,7 +28,7 @@ def preprocess_dataset(dataset: Dataset, tokenizer: BertTokenizerFast) -> Datase
     def tokenize(batch):
         return tokenizer(batch["text"], padding="max_length", truncation=True, return_tensors="np", max_length=512)
 
-    return dataset.map(tokenize, batched=True, remove_columns=["text"])
+    return dataset.map(tokenize, batched=True)
 
 
 def init_model(trial: Any, model_name: str, use_bitfit: bool = False) -> BertForSequenceClassification:
@@ -52,8 +52,9 @@ def init_model(trial: Any, model_name: str, use_bitfit: bool = False) -> BertFor
     model = BertForSequenceClassification.from_pretrained(model_name)
     if use_bitfit:
         for name, param in model.named_parameters():
-            if not name.endswith(".bias"):
-                param.requires_grad = False
+            is_bias = name.endswith(".bias")
+            is_decoder = name.startswith("classifier.") or name.startswith("bert.pooler.dense.")
+            param.requires_grad = is_bias or is_decoder
     return model
 
 
@@ -85,7 +86,6 @@ def init_trainer(model_name: str, train_data: Dataset, val_data: Dataset, use_bi
         per_device_train_batch_size=2,
         gradient_accumulation_steps=8,
         gradient_checkpointing=True,
-        bf16=True,
         learning_rate=2e-5,
         logging_steps=10,
         eval_strategy="epoch",
@@ -113,15 +113,22 @@ def hyperparameter_search_settings() -> Dict[str, Any]:
 
     :return: Keyword arguments for Trainer.hyperparameter_search
     """
+    lr_values = [3e-4, 1e-4, 5e-5, 3e-5]
+    batch_size_values = [8, 16, 32, 64, 128]
+
     return {
         "direction": "maximize",
         "n_trials": 20,
         "backend": "optuna",
+        "sampler": optuna.samplers.GridSampler(
+            {
+                "learning_rate": lr_values,
+                "per_device_train_batch_size": batch_size_values,
+            }
+        ),
         "hp_space": lambda trial: {
-            "learning_rate": trial.suggest_categorical("learning_rate", [3e-4, 1e-4, 5e-5, 3e-5]),
-            "per_device_train_batch_size": trial.suggest_categorical(
-                "per_device_train_batch_size", [8, 16, 32, 64, 128]
-            ),
+            "learning_rate": trial.suggest_categorical("learning_rate", lr_values),
+            "per_device_train_batch_size": trial.suggest_categorical("per_device_train_batch_size", batch_size_values),
         },
         "compute_objective": lambda metrics: metrics["eval_accuracy"],
     }
